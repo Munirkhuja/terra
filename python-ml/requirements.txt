@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+pillow
+exifread
+ultralytics
+faiss-cpu
+python-multipart
+prometheus-client
+kafka-python

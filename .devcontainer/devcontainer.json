@@ -1,0 +1,12 @@
+{
+    "name": "Terra FastAPI Dev",
+    "context": "..",
+    "dockerFile": "../python-ml/Dockerfile",
+    "settings": {
+        "python.defaultInterpreterPath": "/usr/local/bin/python"
+    },
+    "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance"
+    ]
+}

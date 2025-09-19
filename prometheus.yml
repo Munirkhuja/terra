@@ -1,0 +1,11 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'laravel'
+    static_configs:
+      - targets: ['laravel-backend:8000']
+
+  - job_name: 'python-ml'
+    static_configs:
+      - targets: ['python-ml:9000']

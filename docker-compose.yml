@@ -1,0 +1,146 @@
+version: "3.9"
+
+services:
+  laravel-backend:
+    build: ./backend-laravel
+    container_name: laravel-backend
+    environment:
+      DB_HOST: postgis-db
+      DB_PORT: 5432
+      DB_DATABASE: terra
+      DB_USERNAME: terra
+      DB_PASSWORD: terra
+      KAFKA_BROKER: kafka:9092
+    volumes:
+      - ./backend-laravel:/var/www/html
+    depends_on:
+      - postgis-db
+      - python-ml
+      - kafka
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+    restart: unless-stopped
+  nginx:
+    image: nginx:stable-alpine
+    container_name: nginx
+    ports:
+      - "8000:80"
+    volumes:
+      - ./backend-laravel:/var/www/html
+      - ./nginx/conf.d:/etc/nginx/conf.d
+    depends_on:
+      - laravel-backend
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+    restart: unless-stopped
+
+  python-ml:
+    build: ./python-ml
+    container_name: python-ml
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./python-ml:/app
+      - ./python-ml/models:/app/models
+      - ./backend-laravel/storage/app/public/uploads:/app/uploads
+    environment:
+      MODEL_PATH: /app/models/yolov8n.pt
+      KAFKA_BROKER: kafka:9092
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 1G
+    restart: unless-stopped
+
+  postgis-db:
+    build: ./db
+    container_name: postgis-db
+    environment:
+      POSTGRES_USER: terra
+      POSTGRES_PASSWORD: terra
+      POSTGRES_DB: terra
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+    restart: unless-stopped
+
+  zookeeper:
+    image: bitnami/zookeeper:latest
+    container_name: zookeeper
+    environment:
+      ALLOW_ANONYMOUS_LOGIN: "yes"
+    ports:
+      - "2181:2181"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+    restart: unless-stopped
+
+  kafka:
+    image: bitnami/kafka:latest
+    container_name: kafka
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      ALLOW_PLAINTEXT_LISTENER: "yes"
+    ports:
+      - "9092:9092"
+    depends_on:
+      - zookeeper
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  shared_images:
