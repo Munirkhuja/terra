@@ -1,10 +1,9 @@
 FROM php:8.2-fpm AS base
 
-# System deps
+# Install system deps
 RUN apt-get update && apt-get install -y \
     unzip \
     libzip-dev \
-    libc-client-dev \
     libkrb5-dev \
     libpq-dev \
     libxml2-dev \
@@ -12,8 +11,9 @@ RUN apt-get update && apt-get install -y \
     libxslt1-dev \
     libmagickwand-dev \
     libmagickcore-dev \
-    && pecl install imagick \
-    && docker-php-ext-enable imagick \
+    librdkafka-dev \ 
+    && pecl install imagick rdkafka \ 
+    && docker-php-ext-enable imagick rdkafka \
     && rm -rf /var/lib/apt/lists/*
 
 # Core PHP extensions
