@@ -1,0 +1,76 @@
+name: Terra CI/CD
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  laravel-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      # PHP & Laravel
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, bcmath, pdo, sqlite, gd
+
+      - name: Laravel dependencies
+        run: |
+          cd backend-laravel
+          composer install --prefer-dist --no-interaction --no-progress --no-scripts
+
+      - name: Copy .env
+        run: |
+          cd backend-laravel
+          php -r "file_exists('.env') || copy('.env.example', '.env');"
+
+      - name: Generate app key
+        run: cd backend-laravel && php artisan key:generate
+
+      - name: Set permissions
+        run: cd backend-laravel && chmod -R 777 storage bootstrap/cache
+
+      - name: Create SQLite DB
+        run: |
+          cd backend-laravel
+          mkdir -p database
+          touch database/database.sqlite
+
+      - name: Migrate & seed
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: database/database.sqlite
+        run: cd backend-laravel && php artisan migrate --seed --force
+
+      - name: Run Laravel tests
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: database/database.sqlite
+        run: cd backend-laravel && php artisan test --no-interaction --parallel
+
+  python-tests:
+    runs-on: ubuntu-latest
+    needs: laravel-tests
+    steps:
+      - uses: actions/checkout@v3
+
+      # Python
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          cd python-ml
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Python tests
+        run: |
+          cd python-ml
+          pytest
