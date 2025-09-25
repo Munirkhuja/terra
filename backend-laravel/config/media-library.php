@@ -6,7 +6,7 @@ return [
      * The disk on which to store added files and derived images by default. Choose
      * one or more of the disks you've configured in config/filesystems.php.
      */
-    'disk_name' => env('MEDIA_DISK', 'public'),
+    'disk_name' => env('MEDIA_DISK', 's3'),
 
     /*
      * The maximum file size of an item in bytes.
@@ -39,7 +39,7 @@ return [
     /*
      * The fully qualified class name of the media model.
      */
-    'media_model' => Spatie\MediaLibrary\MediaCollections\Models\Media::class,
+    'media_model' => \App\Models\Media::class,
 
     /*
      * The fully qualified class name of the media observer.
@@ -81,7 +81,7 @@ return [
     /*
      * The class that contains the strategy for determining a media file's path.
      */
-    'path_generator' => Spatie\MediaLibrary\Support\PathGenerator\DefaultPathGenerator::class,
+    'path_generator' => \App\Services\MediaPathGenerator::class,
 
     /*
      * The class that contains the strategy for determining how to remove files.

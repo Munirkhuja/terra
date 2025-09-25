@@ -15,6 +15,8 @@ services:
       AWS_SECRET_ACCESS_KEY: minio123
       AWS_BUCKET: uploads
       AWS_ENDPOINT: http://minio:9000
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
     volumes:
       - ./backend-laravel:/var/www/html
     depends_on:
@@ -22,6 +24,7 @@ services:
       - kafka
       - python-ml
       - minio
+      - redis
     deploy:
       resources:
         limits:
@@ -74,12 +77,24 @@ services:
     ports:
       - "9000:9000"   # API
       - "9091:9090"   # Console
+    entrypoint: >
+      /bin/sh -c "
+      set -e;
+      mc alias set myminio http://minio:9000 ${MINIO_ROOT_USER:-minio} ${MINIO_ROOT_PASSWORD:-minio123} || true;
+      until mc ls myminio >/dev/null 2>&1; do
+      echo 'Waiting for MinIO...';
+      sleep 2;
+      done;
+      mc mb --ignore-existing myminio/uploads;
+      echo 'Bucket uploads ensured.';
+      "
     environment:
       MINIO_ROOT_USER: minio
       MINIO_ROOT_PASSWORD: minio123
     command: server /data --console-address ":9090"
     volumes:
       - ./minio/data:/data
+    restart: unless-stopped
 
   postgis-db:
     build: ./db
@@ -97,6 +112,17 @@ services:
         limits:
           cpus: "1.0"
           memory: 512M
+    restart: unless-stopped
+  redis:
+    image: redis:7.2-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 256M
     restart: unless-stopped
 
   zookeeper:
@@ -165,3 +191,4 @@ services:
 
 volumes:
   pgdata:
+  minio_data:

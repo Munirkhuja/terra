@@ -1,76 +1,81 @@
 name: Terra CI/CD
+name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "main", "master" ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ "main", "master" ]
 
 jobs:
+
+  # 1. Проверка кода Laravel
   laravel-tests:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgis/postgis:15-3.3
+        env:
+          POSTGRES_USER: terra
+          POSTGRES_PASSWORD: terra
+          POSTGRES_DB: terra
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U terra" 
+          --health-interval=10s 
+          --health-timeout=5s 
+          --health-retries=5
     steps:
       - uses: actions/checkout@v3
 
-      # PHP & Laravel
-      - uses: shivammathur/setup-php@v2
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.2'
-          extensions: mbstring, bcmath, pdo, sqlite, gd
+          php-version: 8.2
+          extensions: mbstring, pdo, pgsql, bcmath, curl, xml
 
-      - name: Laravel dependencies
-        run: |
-          cd backend-laravel
-          composer install --prefer-dist --no-interaction --no-progress --no-scripts
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist --no-progress --no-interaction
 
       - name: Copy .env
-        run: |
-          cd backend-laravel
-          php -r "file_exists('.env') || copy('.env.example', '.env');"
+        run: cp backend-laravel/.env.example backend-laravel/.env
 
-      - name: Generate app key
-        run: cd backend-laravel && php artisan key:generate
+      - name: Wait for Postgres
+        run: until pg_isready -h localhost -p 5432 -U terra; do sleep 2; done
 
-      - name: Set permissions
-        run: cd backend-laravel && chmod -R 777 storage bootstrap/cache
+      - name: Run migrations
+        run: php artisan migrate --force
 
-      - name: Create SQLite DB
-        run: |
-          cd backend-laravel
-          mkdir -p database
-          touch database/database.sqlite
+      - name: Run tests
+        run: php artisan test
 
-      - name: Migrate & seed
-        env:
-          DB_CONNECTION: sqlite
-          DB_DATABASE: database/database.sqlite
-        run: cd backend-laravel && php artisan migrate --seed --force
-
-      - name: Run Laravel tests
-        env:
-          DB_CONNECTION: sqlite
-          DB_DATABASE: database/database.sqlite
-        run: cd backend-laravel && php artisan test --no-interaction --parallel
-
-  python-tests:
+  # 2. Проверка Python ML
+  python-ml-tests:
     runs-on: ubuntu-latest
-    needs: laravel-tests
+    services:
+      kafka:
+        image: bitnami/kafka:latest
+        env:
+          KAFKA_BROKER_ID: 1
+          KAFKA_ZOOKEEPER_CONNECT: localhost:2181
+          ALLOW_PLAINTEXT_LISTENER: "yes"
+        ports:
+          - 9092:9092
+      zookeeper:
+        image: bitnami/zookeeper:latest
+        ports:
+          - 2181:2181
     steps:
       - uses: actions/checkout@v3
-
-      # Python
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: 3.10
 
       - name: Install dependencies
         run: |
-          cd python-ml
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -r python-ml/requirements.txt
 
-      - name: Run Python tests
-        run: |
-          cd python-ml
-          pytest
+      - name: Run ML test script
+        run: python python-ml/test_model.py
