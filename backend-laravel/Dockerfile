@@ -2,6 +2,7 @@ FROM php:8.2-fpm AS base
 
 # Install system deps
 RUN apt-get update && apt-get install -y \
+    git \
     unzip \
     libzip-dev \
     libkrb5-dev \

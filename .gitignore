@@ -1,0 +1,6 @@
+/.phpunit.cache
+/.fleet
+/.idea
+/.vscode
+/.devcontainer
+/.osp
