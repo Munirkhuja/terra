@@ -17,10 +17,12 @@ use MoonShine\UI\Components\{Layout\Body,
     Layout\Layout,
     Layout\Wrapper};
 use App\MoonShine\Resources\ImageUploadResource;
+use MoonShine\MenuManager\MenuDivider;
 use MoonShine\MenuManager\MenuItem;
 
 final class MoonShineLayout extends AppLayout
 {
+
     protected function assets(): array
     {
         return [
@@ -32,7 +34,9 @@ final class MoonShineLayout extends AppLayout
     {
         return [
             ...parent::menu(),
-            MenuItem::make('ImageUploads', ImageUploadResource::class),
+            MenuDivider::make(),
+            MenuItem::make('site.menu.image_uploads', ImageUploadResource::class)
+                ->translatable(),
         ];
     }
 

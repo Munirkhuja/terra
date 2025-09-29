@@ -20,4 +20,16 @@ enum StatusEnum: string
             self::FAILED => 'Ошибка',
         };
     }
+    public function toString(): ?string
+    {
+        return $this->label();
+    }
+    public function getColor(): ?string
+    {
+        return match ($this) {
+            self::PROCESSING => 'info',
+            self::SUCCESS => 'gray',
+            self::FAILED => 'success',
+        };
+    }
 }

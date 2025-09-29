@@ -3,10 +3,10 @@
 use App\Enums\EventEnum;
 use App\Enums\SourceEnum;
 use App\Enums\StatusEnum;
-use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use MoonShine\Laravel\Models\MoonshineUser;
 
 return new class extends Migration {
     /**
@@ -16,10 +16,12 @@ return new class extends Migration {
     {
         Schema::create('image_uploads', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(User::class)
+            $table->foreignIdFor(MoonshineUser::class)
                 ->constrained()
                 ->cascadeOnDelete()
                 ->cascadeOnUpdate();
+            $table->string('title');
+            $table->text('description')->nullable();
             $table->string('source')->default(SourceEnum::ETC->value);
             $table->string('event')->default(EventEnum::GET_COORDINATE->value);
             $table->string('status')->default(StatusEnum::PROCESSING->value);

@@ -87,6 +87,7 @@ services:
       done;
       mc mb --ignore-existing myminio/uploads;
       echo 'Bucket uploads ensured.';
+      mc anonymous set public myminio/uploads;
       "
     environment:
       MINIO_ROOT_USER: minio
