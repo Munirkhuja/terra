@@ -53,7 +53,7 @@ RUN if getent group ${APP_USERGROUP_ID} >/dev/null; then \
 WORKDIR /var/www/html
 COPY . .
 
-RUN composer install --no-dev --optimize-autoloader
+# RUN composer install --no-dev --optimize-autoloader
 
 # ===================================================
 # Dev stage with Xdebug
