@@ -16,7 +16,7 @@ services:
       AWS_ACCESS_KEY_ID: minio
       AWS_SECRET_ACCESS_KEY: minio123
       AWS_BUCKET: uploads
-      AWS_ENDPOINT: http://minio:9000
+      AWS_ENDPOINT: http://minio:9093
       REDIS_HOST: redis
       REDIS_PORT: 6379
       BROADCAST_DRIVER: pusher
@@ -77,6 +77,8 @@ services:
   python-ml:
     build: ./python-ml
     container_name: python-ml
+    working_dir: /app
+    command: python main.py
     volumes:
       - ./python-ml:/app
       - ./python-ml/models:/app/models
@@ -86,7 +88,7 @@ services:
       KAFKA_CONSUMER_GROUP: ml-worker-group
       KAFKA_INPUT_TOPIC: images.tasks
       KAFKA_OUTPUT_TOPIC: images.results
-      MINIO_URL: http://minio:9000
+      MINIO_URL: http://minio:9093
       MINIO_ACCESS_KEY: minio
       MINIO_SECRET_KEY: minio123
       MINIO_BUCKET: uploads
@@ -100,31 +102,35 @@ services:
           memory: 1G
     restart: unless-stopped
 
+  minio-init:
+    image: minio/mc
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set myminio http://minio:9000 ${MINIO_ROOT_USER:-minio} ${MINIO_ROOT_PASSWORD:-minio123} || true;
+      until mc ls myminio >/dev/null 2>&1; do
+        echo 'Waiting for MinIO...';
+        sleep 2;
+      done;
+      mc mb --ignore-existing myminio/uploads;
+      mc anonymous set public myminio/uploads;
+      echo 'Bucket created';
+      "
+
   minio:
     image: minio/minio
     container_name: minio
     ports:
-      - "9000:9000"   # API
-      - "9091:9090"   # Console
-    entrypoint: >
-      /bin/sh -c "
-      set -e;
-      mc alias set myminio http://minio:9000 ${MINIO_ROOT_USER:-minio} ${MINIO_ROOT_PASSWORD:-minio123} || true;
-      until mc ls myminio >/dev/null 2>&1; do
-      echo 'Waiting for MinIO...';
-      sleep 2;
-      done;
-      mc mb --ignore-existing myminio/uploads;
-      echo 'Bucket uploads ensured.';
-      mc anonymous set public myminio/uploads;
-      "
+      - "9093:9000" # API
+      - "9091:9001" # Web UI
     environment:
       MINIO_ROOT_USER: minio
       MINIO_ROOT_PASSWORD: minio123
-    command: server /data --console-address ":9090"
+    command: server --console-address ":9001" /data
     volumes:
       - ./minio/data:/data
-    restart: unless-stopped
+    restart: always
 
   postgis-db:
     build: ./db
