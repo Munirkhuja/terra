@@ -22,8 +22,13 @@ class ImageUpload extends Model implements HasMedia
         'event',
         'status',
         'error_message',
-        'payload',
+        'metadata',
         'result',
+    ];
+
+    protected $casts = [
+        'metadata' => 'array',
+        'result' => 'array',
     ];
 
     public function registerMediaCollections(): void

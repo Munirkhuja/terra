@@ -26,7 +26,7 @@ return new class extends Migration {
             $table->string('event')->default(EventEnum::GET_COORDINATE->value);
             $table->string('status')->default(StatusEnum::PROCESSING->value);
             $table->text('error_message')->nullable();
-            $table->json('payload')->nullable();
+            $table->json('metadata')->nullable();
             $table->json('result')->nullable();
             $table->softDeletes();
             $table->timestamps();

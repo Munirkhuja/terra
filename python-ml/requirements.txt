@@ -1,5 +1,3 @@
-fastapi
-uvicorn[standard]
 pillow
 exifread
 ultralytics
@@ -7,3 +5,10 @@ faiss-cpu
 python-multipart
 prometheus-client
 kafka-python
+boto3
+psycopg2-binary
+python-dotenv
+numpy
+requests
+pyproj
+pytesseract

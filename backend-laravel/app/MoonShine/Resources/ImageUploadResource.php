@@ -9,6 +9,7 @@ use App\Enums\SourceEnum;
 use App\Enums\StatusEnum;
 use App\Models\ImageUpload;
 use App\MoonShine\Fields\ImageEditor;
+use App\Services\KafkaProducer;
 use Illuminate\Support\Facades\Auth;
 use MoonShine\Contracts\UI\ComponentContract;
 use MoonShine\Contracts\UI\FieldContract;
@@ -104,4 +105,20 @@ class ImageUploadResource extends ModelResource
         $item->status = StatusEnum::PROCESSING;
         return $item;
     }
+
+    protected function afterCreated(mixed $item,KafkaProducer $kafkaProducer): mixed
+    {
+        $kafkaProducer->send(
+            $item->id,
+            $item->getFirstMedia()->getUrl(),
+            $item->metadata,
+        );
+        return $item;
+    }
+
+    protected function onLoad(): void
+    {
+        parent::onLoad();
+    }
+
 }

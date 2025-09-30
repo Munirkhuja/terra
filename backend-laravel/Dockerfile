@@ -11,8 +11,8 @@ RUN apt-get update && apt-get install -y \
     libxslt1-dev \
     libmagickwand-dev \
     libmagickcore-dev \
-    librdkafka-dev \ 
-    && pecl install imagick rdkafka \ 
+    librdkafka-dev \
+    && pecl install imagick rdkafka \
     && docker-php-ext-enable imagick rdkafka \
     && rm -rf /var/lib/apt/lists/*
 
@@ -52,7 +52,7 @@ RUN if getent group ${APP_USERGROUP_ID} >/dev/null; then \
 WORKDIR /var/www/html
 COPY . .
 
-RUN composer install --no-dev --optimize-autoloader
+RUN composer install
 
 # ===================================================
 # Dev stage with Xdebug
