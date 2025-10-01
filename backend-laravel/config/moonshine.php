@@ -98,4 +98,6 @@ return [
 //         'en',
 //         'ru'
     ],
+    'default_location_lng' => env('DEFAULT_LOCATION_LNG', '76.992188'),
+    'default_location_lat' => env('DEFAULT_LOCATION_LAT', '43.225193'),
 ];

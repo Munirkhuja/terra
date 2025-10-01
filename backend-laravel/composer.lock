@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c6c0b0f62f9856c64d8a08d3a4cef81a",
+    "content-hash": "15f2f66ce6c2510f1407243a07acdc29",
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -2796,6 +2796,64 @@
             "time": "2025-08-24T23:51:04+00:00"
         },
         {
+            "name": "maycolmunoz/moon-leaflet",
+            "version": "1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/maycolmunoz/moon-leaflet.git",
+                "reference": "9bfef5e10527b254b24a6fe8a615c2d42451b001"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/maycolmunoz/moon-leaflet/zipball/9bfef5e10527b254b24a6fe8a615c2d42451b001",
+                "reference": "9bfef5e10527b254b24a6fe8a615c2d42451b001",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.2|^8.3"
+            },
+            "require-dev": {
+                "moonshine/moonshine": "^3.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "MaycolMunoz\\MoonLeaflet\\Providers\\MoonLeafletServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "MaycolMunoz\\MoonLeaflet\\": "src/",
+                    "MaycolMunoz\\MoonLeaflet\\Tests\\": "tests/",
+                    "MaycolMunoz\\MoonLeaflet\\Database\\Seeders\\": "database/seeders/",
+                    "MaycolMunoz\\MoonLeaflet\\Database\\Factories\\": "database/factories/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Maycol Muñoz",
+                    "email": "macarny4@gmail.com"
+                }
+            ],
+            "description": "Leaflet field for MoonShine",
+            "keywords": [
+                "leaflet",
+                "map",
+                "moonshine"
+            ],
+            "support": {
+                "issues": "https://github.com/modules/moon-leaflet/issues",
+                "source": "https://github.com/modules/moon-leaflet"
+            },
+            "time": "2025-08-26T15:46:09+00:00"
+        },
+        {
             "name": "monolog/monolog",
             "version": "3.9.0",
             "source": {
@@ -2897,6 +2955,71 @@
                 }
             ],
             "time": "2025-03-24T10:02:05+00:00"
+        },
+        {
+            "name": "moonshine/ace",
+            "version": "1.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/moonshine-software/ace.git",
+                "reference": "2c93d7640e92c04a4d1f9f7ab66b92ee9d6ff9ab"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/moonshine-software/ace/zipball/2c93d7640e92c04a4d1f9f7ab66b92ee9d6ff9ab",
+                "reference": "2c93d7640e92c04a4d1f9f7ab66b92ee9d6ff9ab",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "ext-json": "*",
+                "php": "^8.2|^8.3"
+            },
+            "conflict": {
+                "moonshine/moonshine": "<3.0.0"
+            },
+            "require-dev": {
+                "moonshine/moonshine": "^3.0",
+                "orchestra/testbench": "^9.0",
+                "phpunit/phpunit": "^11.0.1",
+                "rector/rector": "^1.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "MoonShine\\Ace\\Providers\\AceServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "MoonShine\\Ace\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Danil Shutsky",
+                    "email": "info@cutcode.ru",
+                    "homepage": "https://cutcode.dev"
+                }
+            ],
+            "description": "Ace editor for MoonShine",
+            "homepage": "https://moonshine-laravel.com",
+            "keywords": [
+                "ace",
+                "code",
+                "moonshine"
+            ],
+            "support": {
+                "issues": "https://github.com/moonshine-software/ace/issues",
+                "source": "https://github.com/moonshine-software/ace"
+            },
+            "time": "2025-01-24T08:25:43+00:00"
         },
         {
             "name": "moonshine/moonshine",
@@ -9978,13 +10101,13 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": "^8.1",
         "ext-imagick": "*"
     },
-    "platform-dev": {},
+    "platform-dev": [],
     "plugin-api-version": "2.6.0"
 }

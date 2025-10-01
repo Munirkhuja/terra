@@ -3,28 +3,6 @@ ML detection + geolocation + reverse-geocode helper.
 
 Main entrypoint:
     process_image_bytes(image_bytes: bytes, metadata: dict) -> dict
-
-Returned structure:
-{
-  "detections": [
-    {
-      "label": "building",
-      "bbox": [x, y, w, h],
-      "confidence": 0.92,
-      "mask": None,                 # optional
-      "geolocation": {
-         "lat": 55.75,
-         "lon": 37.61,
-         "confidence": 0.95,
-         "error_radius_m": 12,
-         "method": "exif"  # exif | ins_projection | visual_retrieval | georeg
-      },
-      "ocr_text": "ул. Ленина, 1"  # optional
-    },
-    ...
-  ],
-  "image_geolocation": { ... } # optional global guess for whole image
-}
 """
 
 import math
@@ -312,22 +290,11 @@ def project_bbox_center_to_ground_using_ins(
 # Visual retrieval / georeg fallback (placeholders)
 # -------------------------
 def visual_localization_fallback(image: Image.Image) -> Dict[str, Any]:
-    """
-    Placeholder for retrieval + SuperPoint/SuperGlue + PnP pipeline.
-    Should perform: global retrieval -> get candidate panoramas -> feature match -> compute camera pose -> PnP -> lat/lon
-    For now: return coarse random or None.
-    """
-    # realistic implementation is large; so we return a coarse fallback (low confidence)
-    # In production: implement NetVLAD retrieval -> candidate pano query (by bbox/time/source) -> SuperPoint+SuperGlue + RANSAC
     import random
     return {"lat": 55.75 + random.uniform(-0.02, 0.02), "lon": 37.61 + random.uniform(-0.02, 0.02), "confidence": 0.25, "error_radius_m": 2000, "method": "visual_retrieval"}
 
 
 def georeg_model_fallback(image: Image.Image) -> Dict[str, Any]:
-    """
-    ML fallback — geolocation regression (PlaNet-style).
-    Here: coarse guess
-    """
     import random
     return {"lat": 55.75 + random.uniform(-0.5, 0.5), "lon": 37.61 + random.uniform(-0.5, 0.5), "confidence": 0.1, "error_radius_m": 20000, "method": "georeg"}
 

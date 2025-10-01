@@ -9,8 +9,10 @@ use App\Enums\SourceEnum;
 use App\Enums\StatusEnum;
 use App\Models\ImageUpload;
 use App\MoonShine\Fields\ImageEditor;
+use App\MoonShine\Fields\Map;
 use App\Services\KafkaProducer;
 use Illuminate\Support\Facades\Auth;
+use MaycolMunoz\MoonLeaflet\Fields\Leaflet;
 use MoonShine\Contracts\UI\ComponentContract;
 use MoonShine\Contracts\UI\FieldContract;
 use MoonShine\Laravel\Resources\ModelResource;
@@ -65,6 +67,9 @@ class ImageUploadResource extends ModelResource
 
                 Textarea::make(__('site.column.description'), 'description')
                     ->nullable(),
+
+                Textarea::make(__('site.column.metadata'), 'metadata')
+                    ->nullable(),
                 ImageEditor::make(__('site.column.image_select'), ImageUpload::IMAGE_COLLECTION)
                     ->multiple(false)
                     ->removable(),
@@ -79,6 +84,49 @@ class ImageUploadResource extends ModelResource
     {
         return [
             ID::make(),
+            Text::make(__('site.column.title'), 'title'),
+            Enum::make(__('site.column.status'), 'status')
+                ->attach(StatusEnum::class),
+            Enum::make(__('site.column.status'), 'event')
+                ->attach(EventEnum::class),
+            Enum::make(__('site.column.status'), 'source')
+                ->attach(SourceEnum::class),
+            Textarea::make(__('site.column.description'), 'description'),
+            Textarea::make(
+                __('site.column.error_message'),
+                'error_message',
+                static function ($item) {
+                    return '<pre style="white-space: pre-wrap; word-break: break-word;">' .
+                        json_encode($item->error_message ?? [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) .
+                        '</pre>';
+                }
+            )->unescape(),
+            Textarea::make(
+                __('site.column.metadata'),
+                'metadata',
+                static function ($item) {
+                    return '<pre style="white-space: pre-wrap; word-break: break-word;">' .
+                        json_encode($item->metadata ?? [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) .
+                        '</pre>';
+                }
+            )->unescape(),
+            Textarea::make(
+                __('site.column.result'),
+                'result',
+                function ($item) {
+                    return '<pre style="white-space: pre-wrap; word-break: break-word;">' .
+                        json_encode($item->result ?? [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) .
+                        '</pre>';
+                }
+            )->unescape(),
+            MediaLibrary::make(__('site.column.image'), ImageUpload::IMAGE_COLLECTION),
+            Leaflet::make(__('site.column.location'))
+//                ->columns('result->geolocation->lat', 'result->geolocation->lon')
+                ->columns('latitude', 'longitude')
+                ->zoom(14),
+
+            Text::make('Latitude', 'latitude'),
+            Text::make('Longitude', 'longitude'),
         ];
     }
 
@@ -106,19 +154,15 @@ class ImageUploadResource extends ModelResource
         return $item;
     }
 
-    protected function afterCreated(mixed $item,KafkaProducer $kafkaProducer): mixed
+    protected function afterCreated(mixed $item): mixed
     {
+        $kafkaProducer = new KafkaProducer();
         $kafkaProducer->send(
             $item->id,
             $item->getFirstMedia()->getUrl(),
             $item->metadata,
         );
         return $item;
-    }
-
-    protected function onLoad(): void
-    {
-        parent::onLoad();
     }
 
 }

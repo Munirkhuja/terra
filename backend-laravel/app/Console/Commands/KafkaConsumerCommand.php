@@ -5,9 +5,13 @@ namespace App\Console\Commands;
 use App\Enums\StatusEnum;
 use App\Events\ImageProcessed;
 use App\Models\ImageUpload;
+use App\MoonShine\Resources\ImageUploadResource;
 use App\Traits\JsonArrayTrait;
 use Illuminate\Console\Command;
 use Junges\Kafka\Facades\Kafka;
+use MoonShine\Laravel\Notifications\MoonShineNotification;
+use MoonShine\Laravel\Notifications\NotificationButton;
+use MoonShine\UI\Fields\Color;
 
 class KafkaConsumerCommand extends Command
 {
@@ -46,6 +50,23 @@ class KafkaConsumerCommand extends Command
                             'result' => $this->toJsonWithTrait($body),
                             'updated_at' => now(),
                         ]);
+                        $resource = app(ImageUploadResource::class);
+                        $url = $resource->getDetailPageUrl( $upload->id);
+                        MoonShineNotification::send(
+                            message: __('site.message.prepare_result', ['id' => $upload->id]),
+                            // Optional button
+                            button: new NotificationButton(
+                                __('site.button.goto_view_result'),
+                                $url,
+                                attributes: ['target' => '_blank']
+                            ),
+                            // Optional administrator IDs (default for all)
+                            ids: [$upload->user_id],
+                            // Optional icon color
+                            color: Color::GREEN,
+                            // Optional icon
+                            icon: 'information-circle'
+                        );
                         broadcast(new ImageProcessed($upload));
                     } else {
                         logger()->warning('ImageUpload not found for ID: ' . ($body['image_id'] ?? 'null'));

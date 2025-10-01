@@ -4,10 +4,15 @@ declare(strict_types=1);
 
 namespace App\MoonShine\Layouts;
 
+use App\MoonShine\Resources\ImageUploadResource;
+use MoonShine\AssetManager\Css;
+use MoonShine\AssetManager\Js;
 use MoonShine\ColorManager\ColorManager;
 use MoonShine\Contracts\ColorManager\ColorManagerContract;
 use MoonShine\Laravel\Components\Fragment;
 use MoonShine\Laravel\Layouts\AppLayout;
+use MoonShine\MenuManager\MenuDivider;
+use MoonShine\MenuManager\MenuItem;
 use MoonShine\UI\Components\{Layout\Body,
     Layout\Content,
     Layout\Div,
@@ -16,16 +21,18 @@ use MoonShine\UI\Components\{Layout\Body,
     Layout\Html,
     Layout\Layout,
     Layout\Wrapper};
-use App\MoonShine\Resources\ImageUploadResource;
-use MoonShine\MenuManager\MenuDivider;
-use MoonShine\MenuManager\MenuItem;
 
 final class MoonShineLayout extends AppLayout
 {
 
     protected function assets(): array
     {
+        $manifest = json_decode(file_get_contents(public_path('build/manifest.json')), true);
+        $jsFile = $manifest['resources/js/app.js']['file'];
+        $cssFiles = $manifest['resources/css/app.css']['file'];
         return [
+            Css::make('/build/' . $cssFiles),
+            Js::make('/build/' . $jsFile),
             ...parent::assets(),
         ];
     }
@@ -98,10 +105,10 @@ final class MoonShineLayout extends AppLayout
 
     private function getCustomFooterCopyright(): string
     {
-        return \sprintf(
-            <<<'HTML'
+        return sprintf(
+            <<<HTML
                 &copy; %d %s
-                HTML,
+            HTML,
             now()->year,
             config('app.name')
         );

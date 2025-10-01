@@ -16,3 +16,5 @@ use Illuminate\Support\Facades\Route;
 //Route::get('/', function () {
 //    return view('welcome');
 //});
+Route::get('/auth/user',  static fn() => response()->json(auth()->user()))
+    ->middleware('auth:moonshine');

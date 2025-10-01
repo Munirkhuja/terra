@@ -28,8 +28,8 @@ enum StatusEnum: string
     {
         return match ($this) {
             self::PROCESSING => 'info',
-            self::SUCCESS => 'gray',
-            self::FAILED => 'success',
+            self::SUCCESS => 'success',
+            self::FAILED => 'error',
         };
     }
 }
