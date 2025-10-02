@@ -34,8 +34,9 @@ RUN docker-php-ext-install \
     zip \
     gd
 
-# Composer
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+# Install Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+RUN composer --version
 
 # App user
 ARG APP_USER_ID=1000
@@ -51,7 +52,6 @@ RUN if getent group ${APP_USERGROUP_ID} >/dev/null; then \
     && usermod -aG www-data apps
 
 WORKDIR /var/www/html
-COPY . .
 
 RUN composer install
 
