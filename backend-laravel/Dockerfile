@@ -54,6 +54,8 @@ RUN if getent group ${APP_USERGROUP_ID} >/dev/null; then \
 
 WORKDIR /var/www/html
 
+COPY . .
+
 # Копируем конфиг supervisor
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
