@@ -57,7 +57,7 @@ WORKDIR /var/www/html
 COPY . .
 
 # Копируем конфиг supervisor
-COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY supervisord.conf /etc/supervisord.conf
 
 # Запуск supervisor
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
