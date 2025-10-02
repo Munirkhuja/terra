@@ -57,8 +57,6 @@ WORKDIR /var/www/html
 # Копируем конфиг supervisor
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-RUN composer install
-
 # Запуск supervisor
 CMD ["/usr/bin/supervisord", "-n"]
 
