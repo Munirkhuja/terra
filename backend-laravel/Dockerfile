@@ -1,4 +1,4 @@
-FROM php:8.2-fpm AS base
+FROM php:8.2-fpm
 
 # Install system deps
 RUN apt-get update && apt-get install -y \
@@ -55,25 +55,3 @@ WORKDIR /var/www/html
 
 RUN composer install
 
-# ===================================================
-# Dev stage with Xdebug
-# ===================================================
-FROM base AS dev
-
-RUN pecl install xdebug \
-    && docker-php-ext-enable xdebug
-
-# Write all xdebug + dev settings into one ini file
-RUN { \
-    echo "zend_extension=xdebug.so"; \
-    echo "xdebug.mode=debug"; \
-    echo "xdebug.start_with_request=yes"; \
-    echo "xdebug.client_host=host.docker.internal"; \
-    echo "xdebug.client_port=9000"; \
-    echo "xdebug.idekey=PHPSTORM"; \
-    echo "xdebug.log=/tmp/xdebug.log"; \
-    echo "xdebug.discover_client_host=0"; \
-    echo "display_errors=On"; \
-    echo "display_startup_errors=On"; \
-    echo "error_reporting=E_ALL"; \
-} > /usr/local/etc/php/conf.d/99-xdebug.ini
