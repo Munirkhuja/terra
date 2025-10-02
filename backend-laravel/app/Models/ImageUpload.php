@@ -24,6 +24,8 @@ class ImageUpload extends Model implements HasMedia
         'error_message',
         'metadata',
         'result',
+        'latitude',
+        'longitude',
     ];
 
     protected $casts = [
@@ -35,13 +37,5 @@ class ImageUpload extends Model implements HasMedia
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection(self::IMAGE_COLLECTION)->singleFile();
-    }
-    public function getLatitudeAttribute()
-    {
-        return $this->result['geolocation']['lat'] ?? '55,7558';
-    }
-    public function getLongitudeAttribute()
-    {
-        return $this->result['geolocation']['lon'] ?? '37,6173';
     }
 }

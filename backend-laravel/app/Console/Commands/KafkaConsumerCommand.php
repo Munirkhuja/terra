@@ -11,7 +11,7 @@ use Illuminate\Console\Command;
 use Junges\Kafka\Facades\Kafka;
 use MoonShine\Laravel\Notifications\MoonShineNotification;
 use MoonShine\Laravel\Notifications\NotificationButton;
-use MoonShine\UI\Fields\Color;
+use MoonShine\Support\Enums\Color;
 
 class KafkaConsumerCommand extends Command
 {
@@ -48,10 +48,12 @@ class KafkaConsumerCommand extends Command
                         $upload->update([
                             'status' => StatusEnum::SUCCESS->value,
                             'result' => $this->toJsonWithTrait($body),
+                            'latitude' => $body['geolocation']['lat'],
+                            'longitude' => $body['geolocation']['lat'],
                             'updated_at' => now(),
                         ]);
                         $resource = app(ImageUploadResource::class);
-                        $url = $resource->getDetailPageUrl( $upload->id);
+                        $url = $resource->getDetailPageUrl($upload->id);
                         MoonShineNotification::send(
                             message: __('site.message.prepare_result', ['id' => $upload->id]),
                             // Optional button

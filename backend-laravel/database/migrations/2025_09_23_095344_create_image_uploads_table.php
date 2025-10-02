@@ -28,6 +28,8 @@ return new class extends Migration {
             $table->text('error_message')->nullable();
             $table->json('metadata')->nullable();
             $table->json('result')->nullable();
+            $table->double('latitude')->default(0);
+            $table->double('longitude')->default(0);
             $table->softDeletes();
             $table->timestamps();
         });

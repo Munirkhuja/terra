@@ -9,10 +9,9 @@ use App\Enums\SourceEnum;
 use App\Enums\StatusEnum;
 use App\Models\ImageUpload;
 use App\MoonShine\Fields\ImageEditor;
-use App\MoonShine\Fields\Map;
+use App\MoonShine\Fields\Leaflet;
 use App\Services\KafkaProducer;
 use Illuminate\Support\Facades\Auth;
-use MaycolMunoz\MoonLeaflet\Fields\Leaflet;
 use MoonShine\Contracts\UI\ComponentContract;
 use MoonShine\Contracts\UI\FieldContract;
 use MoonShine\Laravel\Resources\ModelResource;
@@ -121,8 +120,10 @@ class ImageUploadResource extends ModelResource
             )->unescape(),
             MediaLibrary::make(__('site.column.image'), ImageUpload::IMAGE_COLLECTION),
             Leaflet::make(__('site.column.location'))
-//                ->columns('result->geolocation->lat', 'result->geolocation->lon')
                 ->columns('latitude', 'longitude')
+                ->isDraggable(true)
+                ->minZoom(5)
+                ->maxZoom(18)
                 ->zoom(14),
 
             Text::make('Latitude', 'latitude'),
