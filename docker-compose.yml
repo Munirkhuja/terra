@@ -162,7 +162,7 @@ services:
     restart: unless-stopped
 
   zookeeper:
-    image: bitnami/zookeeper:3.9.1
+    image: confluentinc/cp-kafka:7.5.0
     container_name: zookeeper
     environment:
       ALLOW_ANONYMOUS_LOGIN: "yes"
@@ -176,7 +176,7 @@ services:
     restart: unless-stopped
 
   kafka:
-    image: bitnami/kafka:3.6.0
+    image: confluentinc/cp-zookeeper:7.5.0
     container_name: kafka
     environment:
       KAFKA_BROKER_ID: 1
