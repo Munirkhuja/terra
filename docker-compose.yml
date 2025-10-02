@@ -143,22 +143,12 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
-    deploy:
-      resources:
-        limits:
-          cpus: "1.0"
-          memory: 512M
     restart: unless-stopped
   redis:
     image: redis:7.2-alpine
     container_name: redis
     ports:
       - "6379:6379"
-    deploy:
-      resources:
-        limits:
-          cpus: "1.0"
-          memory: 256M
     restart: unless-stopped
 
   zookeeper:
@@ -168,11 +158,6 @@ services:
       ALLOW_ANONYMOUS_LOGIN: "yes"
     ports:
       - "2181:2181"
-    deploy:
-      resources:
-        limits:
-          cpus: "0.5"
-          memory: 256M
     restart: unless-stopped
 
   kafka:
@@ -188,11 +173,6 @@ services:
       - "9092:9092"
     depends_on:
       - zookeeper
-    deploy:
-      resources:
-        limits:
-          cpus: "1.0"
-          memory: 512M
     restart: unless-stopped
 
   prometheus:
@@ -202,11 +182,6 @@ services:
       - "9090:9090"
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
-    deploy:
-      resources:
-        limits:
-          cpus: "0.5"
-          memory: 256M
     restart: unless-stopped
 
   grafana:
@@ -218,11 +193,6 @@ services:
       - "3000:3000"
     depends_on:
       - prometheus
-    deploy:
-      resources:
-        limits:
-          cpus: "0.5"
-          memory: 256M
     restart: unless-stopped
 
 volumes:
