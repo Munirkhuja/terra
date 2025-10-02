@@ -1,4 +1,4 @@
-FROM php:8.2.12-fpm-alpine
+FROM php:8.2-fpm
 
 # Install system deps
 RUN apt-get update && apt-get install -y \
