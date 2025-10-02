@@ -2,6 +2,8 @@ services:
   laravel-backend:
     build: ./backend-laravel
     container_name: laravel-backend
+    expose:
+      - '9000'
     environment:
       DB_CONNECTION: pgsql
       DB_HOST: postgis-db
