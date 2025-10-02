@@ -111,6 +111,9 @@ return [
 
     'faker_locale' => 'en_US',
 
+    'default_limit'=> env('DEFAULT_LIMIT', 50),
+    'max_limit'=> env('MAX_LIMIT', 500),
+
     /*
     |--------------------------------------------------------------------------
     | Encryption Key

@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\MoonshineUser;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -12,9 +13,6 @@ use MoonShine\Laravel\Forms\FiltersForm;
 use MoonShine\Laravel\Forms\LoginForm;
 use MoonShine\Laravel\Http\Middleware\Authenticate;
 use MoonShine\Laravel\Http\Middleware\ChangeLocale;
-use MoonShine\Laravel\Layouts\AppLayout;
-use MoonShine\Laravel\Models\MoonshineUser;
-use MoonShine\Laravel\Pages\Dashboard;
 use MoonShine\Laravel\Pages\ErrorPage;
 use MoonShine\Laravel\Pages\LoginPage;
 use MoonShine\Laravel\Pages\ProfilePage;
@@ -98,6 +96,4 @@ return [
 //         'en',
 //         'ru'
     ],
-    'default_location_lng' => env('DEFAULT_LOCATION_LNG', '76.992188'),
-    'default_location_lat' => env('DEFAULT_LOCATION_LAT', '43.225193'),
 ];

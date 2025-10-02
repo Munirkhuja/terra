@@ -1,0 +1,577 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "TERRA APIs ",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/login": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Логин пользователя",
+                "operationId": "0f5784f47a3fcac35f86ec4e82d967d7",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LoginRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Токен успешно создан",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "token": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Неверные данные"
+                    }
+                }
+            }
+        },
+        "/api/logout": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Выход пользователя",
+                "operationId": "d07352aa1a19c3f27d2df5ced5f833cf",
+                "responses": {
+                    "200": {
+                        "description": "Выход выполнен"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/me": {
+            "get": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Информация о текущем пользователе",
+                "operationId": "719e4aa6ea6aff957b1d04c1bf61bee7",
+                "responses": {
+                    "200": {
+                        "description": "Информация о пользователе",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserResource"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Не авторизован"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/image-upload": {
+            "get": {
+                "tags": [
+                    "Images"
+                ],
+                "summary": "Список изображений",
+                "operationId": "c8c445cb51b474aadc0d914631ed336a",
+                "parameters": [
+                    {
+                        "name": "title",
+                        "in": "query",
+                        "description": "Фильтр по заголовку",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "description",
+                        "in": "query",
+                        "description": "Фильтр по описанию",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Статус элемента",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "processing",
+                                "success",
+                                "failed"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "event",
+                        "in": "query",
+                        "description": "Фильтр по событию",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "get_coordinate"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "created_at",
+                        "in": "query",
+                        "description": "Фильтр по точной дате создания",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date-time"
+                        }
+                    },
+                    {
+                        "name": "created_at_from",
+                        "in": "query",
+                        "description": "Начало периода фильтрации по дате создания",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date-time"
+                        }
+                    },
+                    {
+                        "name": "created_at_to",
+                        "in": "query",
+                        "description": "Конец периода фильтрации по дате создания",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date-time"
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Сортировка по полю, например: 'created_at' или '-created_at' для DESC",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Количество элементов на страницу",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 50
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Список изображений",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "image_uploads": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/ImageUploadResource"
+                                            }
+                                        },
+                                        "status_image": {
+                                            "type": "object",
+                                            "example": {
+                                                "pending": "В обработке"
+                                            }
+                                        },
+                                        "event_image": {
+                                            "type": "object",
+                                            "example": {
+                                                "get_coordinate": "Получить координаты"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Images"
+                ],
+                "summary": "Загрузка изображения",
+                "operationId": "658d0d51deadfbb2ecd008d43cfb12c6",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "title"
+                                ],
+                                "properties": {
+                                    "title": {
+                                        "description": "Название изображения",
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "My Photo"
+                                    },
+                                    "description": {
+                                        "description": "Описание изображения",
+                                        "type": "string",
+                                        "example": "Фото с мероприятия"
+                                    },
+                                    "image": {
+                                        "description": "Файл изображения",
+                                        "type": "string",
+                                        "format": "file"
+                                    },
+                                    "image_base64": {
+                                        "description": "Файл изображения",
+                                        "type": "string"
+                                    },
+                                    "metadata": {
+                                        "description": "Дополнительные данные",
+                                        "type": "string",
+                                        "example": {
+                                            "author": "John"
+                                        }
+                                    },
+                                    "event": {
+                                        "description": "Событие изображения",
+                                        "type": "string",
+                                        "enum": [
+                                            "get_coordinate"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Изображение загружено",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "image_upload": {
+                                            "$ref": "#/components/schemas/ImageUploadResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Похожее изображение уже создано недавно и находится в статусе обработки",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Похожее изображение уже создано недавно и находится в статусе обработки"
+                                        },
+                                        "image_upload": {
+                                            "$ref": "#/components/schemas/ImageUploadResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Ошибка валидации",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "title": [
+                                                    "The title field is required."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/image-upload/{id}": {
+            "get": {
+                "tags": [
+                    "Images"
+                ],
+                "summary": "Просмотр одного изображения",
+                "operationId": "cec4090ba7d2e52387c7e1df2ec4c396",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID файла",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Изображение найдено",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "image_upload": {
+                                            "$ref": "#/components/schemas/ImageUploadResource"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Не найдено"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/image-upload/{name}": {
+            "delete": {
+                "tags": [
+                    "Images"
+                ],
+                "summary": "Удаление изображения",
+                "operationId": "c3a669d68a6841ae1a5607ec47369242",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID файла",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Изображение удалено"
+                    },
+                    "404": {
+                        "description": "Не найдено"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "LoginRequest": {
+                "required": [
+                    "email",
+                    "password"
+                ],
+                "properties": {
+                    "email": {
+                        "type": "string",
+                        "example": "user@example.com"
+                    },
+                    "password": {
+                        "type": "string",
+                        "example": "password123"
+                    }
+                },
+                "type": "object"
+            },
+            "ImageUploadResource": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "title": {
+                        "type": "string",
+                        "example": "My uploaded image"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Example description"
+                    },
+                    "source": {
+                        "type": "string",
+                        "example": "api"
+                    },
+                    "source_name": {
+                        "type": "string",
+                        "example": "Api"
+                    },
+                    "event": {
+                        "type": "string",
+                        "example": "get_coordinate"
+                    },
+                    "event_name": {
+                        "type": "string",
+                        "example": "Получить координаты"
+                    },
+                    "status": {
+                        "type": "string",
+                        "example": "processing"
+                    },
+                    "status_name": {
+                        "type": "string",
+                        "example": "В обработке"
+                    },
+                    "error_message": {
+                        "type": "string",
+                        "example": null,
+                        "nullable": true
+                    },
+                    "metadata": {
+                        "type": "string",
+                        "example": {
+                            "exif": "data"
+                        },
+                        "nullable": true
+                    },
+                    "result": {
+                        "type": "string",
+                        "example": null,
+                        "nullable": true
+                    },
+                    "latitude": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 40.12345
+                    },
+                    "longitude": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 69.12345
+                    },
+                    "image": {
+                        "type": "string",
+                        "format": "url",
+                        "example": "https://example.com/storage/images/1.jpg"
+                    }
+                },
+                "type": "object"
+            },
+            "UserResource": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "John Doe"
+                    },
+                    "email": {
+                        "type": "string",
+                        "example": "john@example.com"
+                    },
+                    "avatar": {
+                        "type": "string",
+                        "example": "path.jpg"
+                    },
+                    "role": {
+                        "type": "string",
+                        "example": "Admin"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "example": "2025-09-23 22:02:34"
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "name": "Authorization",
+                "in": "header",
+                "scheme": "Bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Auth",
+            "description": "Авторизация пользователей"
+        },
+        {
+            "name": "Images",
+            "description": "Управление изображениями"
+        }
+    ]
+}

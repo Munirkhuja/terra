@@ -143,6 +143,7 @@ class ImageUploadResource extends ModelResource
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
             ImageUpload::IMAGE_COLLECTION => ['required'],
+            'metadata' => ['nullable','string'],
         ];
     }
 
