@@ -59,9 +59,6 @@ COPY . .
 # Копируем конфиг supervisor
 COPY supervisord.conf /etc/supervisord.conf
 
-# Запуск supervisor
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
-
 FROM base as dev
 
 RUN touch /tmp/xdebug.log
