@@ -4,10 +4,6 @@ namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
-use Illuminate\Validation\ValidationException;
-use Illuminate\Auth\AuthenticationException;
-use Symfony\Component\HttpKernel\Exception\HttpException;
-use Illuminate\Http\JsonResponse;
 
 class Handler extends ExceptionHandler
 {
