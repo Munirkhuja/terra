@@ -57,11 +57,6 @@ WORKDIR /var/www/html
 # Копируем конфиг supervisor
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# Права на storage и cache
-RUN chown -R apps:www-data /var/www/html \
-    && chmod -R 755 /var/www/html/storage \
-    && chmod -R 755 /var/www/html/bootstrap/cache \
-
 RUN composer install
 
 # Запуск supervisor
