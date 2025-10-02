@@ -14,6 +14,8 @@ use App\Services\KafkaProducer;
 use Illuminate\Support\Facades\Auth;
 use MoonShine\Contracts\UI\ComponentContract;
 use MoonShine\Contracts\UI\FieldContract;
+use MoonShine\ImportExport\Contracts\HasImportExportContract;
+use MoonShine\ImportExport\Traits\ImportExportConcern;
 use MoonShine\Laravel\Resources\ModelResource;
 use MoonShine\MenuManager\Attributes\Order;
 use MoonShine\UI\Components\Layout\Box;
@@ -28,8 +30,10 @@ use VI\MoonShineSpatieMediaLibrary\Fields\MediaLibrary;
  * @extends ModelResource<ImageUpload>
  */
 #[Order(1)]
-class ImageUploadResource extends ModelResource
+class ImageUploadResource extends ModelResource implements HasImportExportContract
 {
+    use ImportExportConcern;
+
     protected string $model = ImageUpload::class;
 
     public function getTitle(): string
@@ -73,6 +77,75 @@ class ImageUploadResource extends ModelResource
                     ->multiple(false)
                     ->removable(),
             ])
+        ];
+    }
+
+    protected function importFields(): iterable
+    {
+        return [
+            Text::make(__('site.column.title'), 'title')
+                ->required(),
+
+            Textarea::make(__('site.column.description'), 'description')
+                ->nullable(),
+
+            Textarea::make(__('site.column.metadata'), 'metadata')
+                ->nullable(),
+            ImageEditor::make(__('site.column.image_select'), ImageUpload::IMAGE_COLLECTION)
+                ->multiple(false)
+                ->removable(),
+        ];
+    }
+
+    protected function exportFields(): iterable
+    {
+        return [
+            ID::make(),
+            Text::make(__('site.column.title'), 'title'),
+            Enum::make(__('site.column.status'), 'status')
+                ->attach(StatusEnum::class),
+            Enum::make(__('site.column.status'), 'event')
+                ->attach(EventEnum::class),
+            Enum::make(__('site.column.status'), 'source')
+                ->attach(SourceEnum::class),
+            Textarea::make(__('site.column.description'), 'description'),
+            Textarea::make(
+                __('site.column.error_message'),
+                'error_message',
+                static function ($item) {
+                    return '<pre style="white-space: pre-wrap; word-break: break-word;">' .
+                        json_encode($item->error_message ?? [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) .
+                        '</pre>';
+                }
+            )->unescape(),
+            Textarea::make(
+                __('site.column.metadata'),
+                'metadata',
+                static function ($item) {
+                    return '<pre style="white-space: pre-wrap; word-break: break-word;">' .
+                        json_encode($item->metadata ?? [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) .
+                        '</pre>';
+                }
+            )->unescape(),
+            Textarea::make(
+                __('site.column.result'),
+                'result',
+                function ($item) {
+                    return '<pre style="white-space: pre-wrap; word-break: break-word;">' .
+                        json_encode($item->result ?? [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) .
+                        '</pre>';
+                }
+            )->unescape(),
+            MediaLibrary::make(__('site.column.image'), ImageUpload::IMAGE_COLLECTION),
+            Leaflet::make(__('site.column.location'))
+                ->columns('latitude', 'longitude')
+                ->isDraggable(true)
+                ->minZoom(5)
+                ->maxZoom(18)
+                ->zoom(14),
+
+            Text::make('Latitude', 'latitude'),
+            Text::make('Longitude', 'longitude'),
         ];
     }
 
@@ -143,7 +216,7 @@ class ImageUploadResource extends ModelResource
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
             ImageUpload::IMAGE_COLLECTION => ['required'],
-            'metadata' => ['nullable','string'],
+            'metadata' => ['nullable', 'string'],
         ];
     }
 
