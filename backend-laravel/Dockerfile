@@ -53,5 +53,17 @@ RUN if getent group ${APP_USERGROUP_ID} >/dev/null; then \
 
 WORKDIR /var/www/html
 
+# Копируем конфиг supervisor
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+# Права на storage и cache
+RUN chown -R apps:www-data /var/www/html \
+    && chmod -R 755 /var/www/html/storage \
+    && chmod -R 755 /var/www/html/bootstrap/cache \
+
 RUN composer install
+
+# Запуск supervisor
+CMD ["/usr/bin/supervisord", "-n"]
+
 
