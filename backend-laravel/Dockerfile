@@ -13,6 +13,7 @@ RUN apt-get update && apt-get install -y \
     libmagickwand-dev \
     libmagickcore-dev \
     librdkafka-dev \
+    supervisor \
     && pecl install imagick rdkafka \
     && docker-php-ext-enable imagick rdkafka \
     && rm -rf /var/lib/apt/lists/*
