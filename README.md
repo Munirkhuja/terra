@@ -33,10 +33,12 @@ docker compose run --rm minio-init
 ```
 ### 3.Настройка окружения
 ```bash
+composer install
 cp .env.example .env
 # Настройте DB, MinIO, Kafka и JWT_SECRET
 php artisan key:generate
-php artisan jwt:secret
+php artisan migrate
+
 ```
 - **Laravel API:** http://localhost:8000
 - **MinIO Web UI:** http://localhost:9091 (логин: minio, пароль: minio123)
