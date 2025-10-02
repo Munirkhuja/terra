@@ -39,7 +39,7 @@ services:
     restart: unless-stopped
 
   nginx:
-    image: nginx:1.25-alpine
+    image: nginx:stable-alpine
     container_name: nginx
     ports:
       - "8000:80"
