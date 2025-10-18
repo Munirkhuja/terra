@@ -1,11 +1,28 @@
 global:
   scrape_interval: 15s
+  evaluation_interval: 15s
 
 scrape_configs:
-  - job_name: 'laravel'
-    static_configs:
-      - targets: ['nginx:8000']
-
   - job_name: 'python-ml'
     static_configs:
       - targets: ['python-ml:9000']
+
+  - job_name: 'soketi'
+    static_configs:
+      - targets: [ 'soketi:9601' ]
+
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: [ 'prometheus:9090' ]
+
+  - job_name: 'redis'
+    static_configs:
+      - targets: [ 'redis_exporter:9121' ]
+
+  - job_name: 'laravel'
+    static_configs:
+      - targets: [ 'php-fpm_exporter:9253' ]
+
+  - job_name: 'nginx'
+    static_configs:
+      - targets: [ 'nginx_exporter:9113' ]
