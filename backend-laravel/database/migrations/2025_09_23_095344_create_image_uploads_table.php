@@ -16,8 +16,8 @@ return new class extends Migration {
     {
         Schema::create('image_uploads', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(MoonshineUser::class)
-                ->constrained()
+            $table->foreignId('user_id')
+                ->constrained('moonshine_users')
                 ->cascadeOnDelete()
                 ->cascadeOnUpdate();
             $table->string('title');

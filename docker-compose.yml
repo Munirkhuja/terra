@@ -18,7 +18,7 @@ services:
       AWS_ACCESS_KEY_ID: minio
       AWS_SECRET_ACCESS_KEY: minio123
       AWS_BUCKET: uploads
-      AWS_ENDPOINT: http://minio:9093
+      AWS_ENDPOINT: http://minio:9000
       REDIS_HOST: redis
       REDIS_PORT: 6379
       BROADCAST_DRIVER: pusher
@@ -51,21 +51,23 @@ services:
     depends_on:
       - laravel-backend
     restart: unless-stopped
+
   soketi:
-    image: quay.io/soketi/soketi:latest
+    image: quay.io/soketi/soketi:latest-16-alpine
     container_name: soketi
-    ports:
-      - "6001:6001"
-      - "6002:6002"
     environment:
-      APP_ID: local
-      APP_KEY: local
-      APP_SECRET: local
-      PORT: 6001
-      HTTP_PORT: 6002
-      LOG_LEVEL: info
-      CLUSTER: mt1
-    restart: unless-stopped
+      SOKETI_DEBUG: "1"
+      SOKETI_METRICS_ENABLED: "1"
+      SOKETI_METRICS_SERVER_PORT: "9601"
+      SOKETI_DEFAULT_APP_ID: terra-local
+      SOKETI_DEFAULT_APP_KEY: terra-local
+      SOKETI_DEFAULT_APP_SECRET: terra-local
+    ports:
+      - "${SOKETI_PORT:-6001}:6001"
+      - "${SOKETI_METRICS_SERVER_PORT:-9601}:9601"
+    restart: always
+    mem_limit: 1g
+
   python-ml:
     build: ./python-ml
     container_name: python-ml
@@ -80,7 +82,7 @@ services:
       KAFKA_CONSUMER_GROUP: ml-worker-group
       KAFKA_INPUT_TOPIC: images.tasks
       KAFKA_OUTPUT_TOPIC: images.results
-      MINIO_URL: http://minio:9093
+      MINIO_URL: http://minio:9000
       MINIO_ACCESS_KEY: minio
       MINIO_SECRET_KEY: minio123
       MINIO_BUCKET: uploads
@@ -131,6 +133,7 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     restart: unless-stopped
+
   redis:
     image: redis:7.2-alpine
     container_name: redis
@@ -138,54 +141,100 @@ services:
       - "6379:6379"
     restart: unless-stopped
 
-  zookeeper:
-    image: confluentinc/cp-kafka:7.5.0
-    container_name: zookeeper
-    environment:
-      ALLOW_ANONYMOUS_LOGIN: "yes"
-    ports:
-      - "2181:2181"
-    deploy:
-      resources:
-        limits:
-          cpus: "0.5"
-          memory: 256M
-    restart: unless-stopped
-
   kafka:
-    image: confluentinc/cp-zookeeper:7.5.0
-    container_name: kafka
-    environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
-      ALLOW_PLAINTEXT_LISTENER: "yes"
+    image: 'bitnami/kafka:3.5'
+    restart: always
     ports:
-      - "9092:9092"
+      - '9092:9094'
+    environment:
+      # KRaft settings
+      - KAFKA_CFG_NODE_ID=0
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
+      # Listeners
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093,EXTERNAL://:9094
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://:9092,EXTERNAL://:9094
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+
+  kafka-ui:
+    image: 'provectuslabs/kafka-ui:latest'
+    restart: always
+    ports:
+      - '8085:8080'
+    environment:
+      - DYNAMIC_CONFIG_ENABLED=true
+      #- SERVER_SERVLET_CONTEXT_PATH=/kafka
+      - KAFKA_CLUSTERS_0_NAME=local
+      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092
+      - CONNECT_CLUSTERS_0_NAME=local
+      - CONNECT_CLUSTERS_0_URL=http://kafka:8083
     depends_on:
-      - zookeeper
-    restart: unless-stopped
+      - kafka
+
+  php-fpm_exporter:
+    image: hipages/php-fpm_exporter:latest
+    container_name: php-fpm_exporter
+    command:
+      - "--phpfpm.scrape-uri=tcp://laravel-backend:9000/status"
+    ports:
+      - "9253:9253"
+    depends_on:
+      - php-fpm
+    restart: always
+
+  nginx_exporter:
+    image: nginx/nginx-prometheus-exporter:latest
+    container_name: nginx_exporter
+    command:
+      - "-nginx.scrape-uri=http://nginx/stub_status"
+    ports:
+      - "9113:9113"
+    depends_on:
+      - nginx
+    restart: always
+
+  redis_exporter:
+    image: oliver006/redis_exporter:latest
+    container_name: redis_exporter
+    environment:
+      - REDIS_ADDR=redis:6379
+    ports:
+      - "9121:9121"
+    depends_on:
+      - redis
+    restart: always
 
   prometheus:
     image: prom/prometheus:v2.49.0
     container_name: prometheus
+    restart: always
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.retention.size=1GB'
     ports:
       - "9090:9090"
+    depends_on:
+      - nginx_exporter
+      - php-fpm_exporter
+      - redis_exporter
+      - soketi
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-    restart: unless-stopped
+      - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
 
   grafana:
     image: grafana/grafana:10.4.0
     container_name: grafana
+    restart: unless-stopped
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=hamroh-gram-admin
+      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
     ports:
       - "3000:3000"
     depends_on:
       - prometheus
-    restart: unless-stopped
 
 volumes:
   pgdata:

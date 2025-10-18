@@ -233,9 +233,9 @@ class ImageUploadResource extends ModelResource implements HasImportExportContra
     {
         $kafkaProducer = new KafkaProducer();
         $kafkaProducer->send(
-            $item->id,
-            $item->getFirstMedia()->getUrl(),
-            $item->metadata,
+            (string)$item->id,
+            $item->getFirstMediaUrl(ImageUpload::IMAGE_COLLECTION),
+            $item->metadata ?? [],
         );
         return $item;
     }

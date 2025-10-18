@@ -38,7 +38,7 @@ class KafkaConsumerCommand extends Command
     {
         $this->info("Listening for messages from Kafka...");
 
-        Kafka::consume([config('kafka.topic_responses')])
+        Kafka::consumer([config('kafka.output_topic')])
             ->withHandler(function ($message) {
                 $body = $message->getBody();
                 try {
@@ -79,6 +79,6 @@ class KafkaConsumerCommand extends Command
                 $this->info("Received: " . json_encode($body));
             })
             ->build()
-            ->start();
+            ->consume();
     }
 }
