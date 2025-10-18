@@ -142,7 +142,7 @@ services:
     restart: unless-stopped
 
   kafka:
-    image: bitnami/kafka:3.7
+    image: bitnami/kafka:latest
     restart: always
     ports:
       - '9092:9094'
