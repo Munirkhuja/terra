@@ -181,7 +181,7 @@ services:
     ports:
       - "9253:9253"
     depends_on:
-      - php-fpm
+      - laravel-backend
     restart: always
 
   nginx_exporter:
