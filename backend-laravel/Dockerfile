@@ -59,3 +59,4 @@ COPY . .
 # Копируем конфиг supervisor
 COPY supervisord.conf /etc/supervisord.conf
 
+EXPOSE 9000
