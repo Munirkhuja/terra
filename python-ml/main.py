@@ -62,7 +62,6 @@ producer: Optional[KafkaProducer] = None
 consumer: Optional[KafkaConsumer] = None
 s3_client = None
 running = True
-model = YOLO("yolov8n.pt")
 
 
 def init_kafka():
