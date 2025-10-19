@@ -175,39 +175,6 @@ services:
     depends_on:
       - kafka
 
-  php-fpm_exporter:
-    image: hipages/php-fpm_exporter:2
-    container_name: php-fpm_exporter
-    command:
-      - "--phpfpm.scrape-uri=tcp://laravel-backend:9000/status"
-    ports:
-      - "9253:9253"
-    depends_on:
-      - laravel-backend
-    restart: always
-
-  nginx_exporter:
-    image: nginx/nginx-prometheus-exporter:1.5.1
-    container_name: nginx_exporter
-    command:
-      - "-nginx.scrape-uri=http://nginx/stub_status"
-    ports:
-      - "9113:9113"
-    depends_on:
-      - nginx
-    restart: always
-
-  redis_exporter:
-    image: oliver006/redis_exporter:v1.79.0-alpine
-    container_name: redis_exporter
-    environment:
-      - REDIS_ADDR=redis:6379
-    ports:
-      - "9121:9121"
-    depends_on:
-      - redis
-    restart: always
-
   prometheus:
     image: prom/prometheus:v2.49.0
     container_name: prometheus
@@ -218,9 +185,6 @@ services:
     ports:
       - "9090:9090"
     depends_on:
-      - nginx_exporter
-      - php-fpm_exporter
-      - redis_exporter
       - soketi
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
