@@ -59,4 +59,10 @@ COPY . .
 # Копируем конфиг supervisor
 COPY supervisord.conf /etc/supervisord.conf
 
+# Настроим PHP-FPM на слушание всех интерфейсов
+RUN sed -i 's/listen = .*/listen = 0.0.0.0:9000/' /usr/local/etc/php-fpm.d/www.conf
+
+# (Опционально) можно убрать ограничение на allowed_clients
+RUN sed -i 's/;listen.allowed_clients = .*/listen.allowed_clients = 0.0.0.0/' /usr/local/etc/php-fpm.d/www.conf
+
 EXPOSE 9000
