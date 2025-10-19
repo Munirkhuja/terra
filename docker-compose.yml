@@ -11,7 +11,7 @@ services:
       DB_DATABASE: terra
       DB_USERNAME: terra
       DB_PASSWORD: terra
-      KAFKA_BROKERS: kafka:9092
+      KAFKA_BROKERS: kafka:9094
       KAFKA_CONSUMER_GROUP: ml-worker-group
       KAFKA_INPUT_TOPIC: images.tasks
       KAFKA_OUTPUT_TOPIC: images.results
@@ -78,7 +78,7 @@ services:
       - ./python-ml/models:/app/models
     environment:
       MODEL_PATH: /app/models/yolov8n.pt
-      KAFKA_BROKERS: kafka:9092
+      KAFKA_BROKERS: kafka:9094
       KAFKA_CONSUMER_GROUP: ml-worker-group
       KAFKA_INPUT_TOPIC: images.tasks
       KAFKA_OUTPUT_TOPIC: images.results
@@ -145,7 +145,7 @@ services:
     image: public.ecr.aws/bitnami/kafka:3.7
     restart: always
     ports:
-      - '9092:9094'
+      - '9094:9094'
     environment:
       # KRaft settings
       - KAFKA_CFG_NODE_ID=0
