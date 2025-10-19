@@ -46,16 +46,16 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(me
 logger = logging.getLogger('ml-kafka-worker')
 
 # --- Configuration ---
-KAFKA_BOOTSTRAP = os.getenv('KAFKA_BOOTSTRAP_SERVERS', os.getenv('KAFKA_BROKER', 'localhost:9092'))
+KAFKA_BOOTSTRAP = os.getenv('KAFKA_BOOTSTRAP_SERVERS', os.getenv('KAFKA_BROKER', 'kafka:9094'))
 KAFKA_GROUP = os.getenv('KAFKA_CONSUMER_GROUP', 'ml-worker-group')
 KAFKA_INPUT_TOPIC = os.getenv('KAFKA_INPUT_TOPIC', 'images.tasks')
 KAFKA_OUTPUT_TOPIC = os.getenv('KAFKA_OUTPUT_TOPIC', 'images.results')
 WORKER_ID = os.getenv('WORKER_ID', 'worker-1')
 
-S3_ENDPOINT = os.getenv('MINIO_URL')
-S3_ACCESS = os.getenv('MINIO_ACCESS_KEY')
-S3_SECRET = os.getenv('MINIO_SECRET_KEY')
-S3_BUCKET = os.getenv('MINIO_BUCKET')
+S3_ENDPOINT = os.getenv('MINIO_URL','http://minio:9000')
+S3_ACCESS = os.getenv('MINIO_ACCESS_KEY','minio')
+S3_SECRET = os.getenv('MINIO_SECRET_KEY','minio123')
+S3_BUCKET = os.getenv('MINIO_BUCKET','uploads')
 
 # --- Kafka clients ---
 producer: Optional[KafkaProducer] = None
